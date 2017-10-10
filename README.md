@@ -1,4 +1,8 @@
 [![License](https://img.shields.io/github/license/joshdk/ratelimit.svg)](https://opensource.org/licenses/MIT)
+[![GoDoc](https://godoc.org/github.com/joshdk/ratelimit?status.svg)](https://godoc.org/github.com/joshdk/ratelimit)
+[![Go Report Card](https://goreportcard.com/badge/github.com/joshdk/ratelimit)](https://goreportcard.com/report/github.com/joshdk/ratelimit)
+[![CircleCI](https://circleci.com/gh/joshdk/ratelimit.svg?&style=shield)](https://circleci.com/gh/joshdk/ratelimit/tree/master)
+[![CodeCov](https://codecov.io/gh/joshdk/ratelimit/branch/master/graph/badge.svg)](https://codecov.io/gh/joshdk/ratelimit)
 
 # Ratelimit
 

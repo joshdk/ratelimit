@@ -1,3 +1,7 @@
+// Copyright 2017 Josh Komoroske. All rights reserved.
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE.txt file.
+
 package ratelimit
 
 import (
@@ -62,7 +66,7 @@ func (pool *Pool) Wait() {
 	pool.group.Wait()
 }
 
-func NewPool(actions float64, duration time.Duration) Pool {
+func NewPool(actions float64, duration time.Duration) *Pool {
 
 	var limit = rate.Limit(actions / duration.Seconds())
 
@@ -71,5 +75,5 @@ func NewPool(actions float64, duration time.Duration) Pool {
 		tasks:   make(chan Task),
 	}
 
-	return pool
+	return &pool
 }

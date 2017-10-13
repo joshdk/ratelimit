@@ -18,51 +18,38 @@ type Pool struct {
 	limiter *rate.Limiter
 	ctx     context.Context
 	cancel  context.CancelFunc
-	tasks   chan Task
 	group   sync.WaitGroup
 }
 
+// Add submits task into the pool for immediate (but rate-limited) execution.
+// In the event that Stop() is called, this task will be discarded.
 func (pool *Pool) Add(task Task) {
-	go func() {
-		pool.tasks <- task
-	}()
-}
-
-func (pool *Pool) Start() {
-	pool.ctx, pool.cancel = context.WithCancel(context.Background())
-
 	pool.group.Add(1)
 	go func() {
 		defer pool.group.Done()
 
-		for {
-			if err := pool.limiter.Wait(pool.ctx); err != nil {
-				return
-			}
-
-			select {
-			case <-pool.ctx.Done():
-				return
-
-			case task := <-pool.tasks:
-				pool.group.Add(1)
-				go func() {
-					defer pool.group.Done()
-
-					task()
-				}()
-
-			}
+		if err := pool.limiter.Wait(pool.ctx); err != nil {
+			return
 		}
 
+		task()
 	}()
 }
 
+// Stop cancels all tasks in the pool, and prevents any others from being added.
 func (pool *Pool) Stop() {
 	pool.cancel()
 }
 
+// Wait blocks until either: All tasks in the pool have finished executing, or Stop() has been called.
+// Tasks that are currently executing are allowed to finish
 func (pool *Pool) Wait() {
+	go func() {
+		pool.group.Wait()
+		pool.Stop()
+	}()
+
+	<-pool.ctx.Done()
 	pool.group.Wait()
 }
 
@@ -72,8 +59,9 @@ func NewPool(actions float64, duration time.Duration) *Pool {
 
 	pool := Pool{
 		limiter: rate.NewLimiter(limit, 1),
-		tasks:   make(chan Task),
 	}
+
+	pool.ctx, pool.cancel = context.WithCancel(context.Background())
 
 	return &pool
 }

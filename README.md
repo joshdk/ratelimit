@@ -22,9 +22,6 @@ for i := 0; i < 100; i++ {
 	})
 }
 
-// Start scheduling tasks
-pool.Start()
-
 // Sleep for 10 seconds as tasks execute
 time.Sleep(10 * time.Second)
 
